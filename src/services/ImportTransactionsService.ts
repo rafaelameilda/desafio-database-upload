@@ -1,6 +1,7 @@
 import { getCustomRepository, getRepository, In } from 'typeorm';
-import fs from 'fs';
 import csvParse from 'csv-parse';
+import fs from 'fs';
+
 import Transaction from '../models/Transaction';
 import Category from '../models/Category';
 
@@ -53,12 +54,12 @@ class ImportTransactionsService {
       (category: Category) => category.title,
     );
 
-    const addCategoryTitle = categories
+    const addCategoryTitles = categories
       .filter(category => !existentCategoriesTitles.includes(category))
       .filter((value, index, self) => self.indexOf(value) === index);
 
     const newCategories = categoriesRepository.create(
-      addCategoryTitle.map(title => ({
+      addCategoryTitles.map(title => ({
         title,
       })),
     );
@@ -78,7 +79,7 @@ class ImportTransactionsService {
       })),
     );
 
-    await transactionRepository.create(createdTransactions);
+    await transactionRepository.save(createdTransactions);
 
     await fs.promises.unlink(filePath);
 
